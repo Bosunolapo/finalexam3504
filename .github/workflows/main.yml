@@ -1,0 +1,49 @@
+name: Push-to-EC2
+
+# Trigger deployment only on push to main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2 on main branch push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v2
+
+      - name: Deploy to Server 1
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          TARGET: ${{ secrets.TARGET_DIR }}
+
+      - name: Executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo mkdir final
+            sudo mkdir final/finalexam3504
+            sudo mv index.html final/finalexam3504
+            sudo mv README.md final/finalexam3504
+            sudo mv css/final/finalexam3504/
+            cd final
+            sudo yum update -y
+            sudo yum install docker -y
+            sudo systemctl start docker
+            sudo echo -e "FROM httpd:2.4\nCOPY ./exam/ /usr/local/apache2/htdocs" | sudo tee Dockerfile
+            sudo docker build -t final-image .
+            sudo docker tag "$(sudo docker images -q final-image)" bosunolapo/final-image:version1.0
+            sudo docker push bosunolapo/final-image:version1.0
+            sudo docker run --name final-container -p 80:80 -d bosunolapo/final-image:version1.0
+           
+             
+          
