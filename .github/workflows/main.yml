@@ -30,16 +30,16 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo mkdir final
-            sudo mkdir final/finalexam3504
-            sudo mv index.html final/finalexam3504
-            sudo mv README.md final/finalexam3504
-            sudo mv css/final/finalexam3504/
-            cd final
+            sudo mkdir course
+            sudo mkdir course/finalexam3504
+            sudo mv index.html course/finalexam3504
+            sudo mv README.md course/finalexam3504
+            sudo mv css/course/finalexam3504/
+            cd course
             sudo yum update -y
             sudo yum install docker -y
             sudo systemctl start docker
-            sudo echo -e "FROM httpd:2.4\nCOPY ./exam/ /usr/local/apache2/htdocs" | sudo tee Dockerfile
+            sudo echo -e "FROM httpd:2.4\nCOPY ./finalexam3504/ /usr/local/apache2/htdocs" | sudo tee Dockerfile
             sudo docker build -t final-image .
             sudo docker tag "$(sudo docker images -q final-image)" bosunolapo/final-image:version1.0
             sudo docker push bosunolapo/final-image:version1.0
