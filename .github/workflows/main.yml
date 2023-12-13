@@ -30,12 +30,12 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo mkdir courses
-            sudo mkdir courses/finalexam3504
-            sudo mv olaexam/index.html courses/finalexam3504
-            sudo mv README.md courses/finalexam3504
-            sudo mv olaexam/css.css courses/finalexam3504/
-            cd courses
+            sudo mkdir college
+            sudo mkdir college/finalexam3504
+            sudo mv finalexam3504/olaexam/index.html college/finalexam3504
+            sudo mv finalexam3504/README.md college/finalexam3504
+            sudo mv finalexam/olaexam/css.css college/finalexam3504/
+            cd college
             sudo yum update -y
             sudo yum install docker -y
             sudo systemctl start docker
