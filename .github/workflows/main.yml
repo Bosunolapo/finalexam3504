@@ -1,46 +1,31 @@
-name: Push-to-EC2
+# This is a basic workflow to help you get started with Actions
+name: build docker image
 
-# Trigger deployment only on push to main branch
 on:
   push:
     branches:
       - main
 
 jobs:
-  deploy:
-    name: Deploy to EC2 on main branch push
+  docker:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout the files
-        uses: actions/checkout@v2
-
-      - name: Deploy to Server 1
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_DNS }}
-          REMOTE_USER: ${{ secrets.USERNAME }}
-          TARGET: ${{ secrets.TARGET_DIR }}
-
-      - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
         with:
-          host: ${{ secrets.HOST_DNS }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            sudo mkdir courses
-            sudo mkdir courses/finalexam3504
-            sudo mv olaexam/index.html courses/finalexam3504
-            sudo mv README.md courses/finalexam3504
-            sudo mv olaexam/css.css courses/finalexam3504/
-            cd courses
-            sudo yum update -y
-            sudo yum install docker -y
-            sudo systemctl start docker
-            sudo echo -e "FROM httpd:2.4\nCOPY ./finalexam3504/ /usr/local/apache2/htdocs" | sudo tee Dockerfile
-            sudo docker build -t final-image .
-            sudo docker tag "$(sudo docker images -q final-image)" bosunolapo/final-image:version1.0
-            sudo docker push bosunolapo/final-image:version1.0
-            sudo docker run --name final-container -p 80:80 -d bosunolapo/final-image:version1.0
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ola/clcm3504_finalexam_ola:latest
