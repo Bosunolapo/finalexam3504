@@ -32,9 +32,9 @@ jobs:
           script: |
             sudo mkdir course
             sudo mkdir course/finalexam3504
-            sudo mv index.html course/finalexam3504
+            sudo mv olaexam/index.html course/finalexam3504
             sudo mv README.md course/finalexam3504
-            sudo mv css/course/finalexam3504/
+            sudo mv olaexam/css.css course/finalexam3504/
             cd course
             sudo yum update -y
             sudo yum install docker -y
